@@ -440,6 +440,21 @@ class Agent:
             message_content: List[ContentBlock] = [{"text": prompt}]
             new_message: Message = {"role": "user", "content": message_content}
             self.messages.append(new_message)
+            # Add prefill to the message
+            prefill = kwargs.get("prefill", "")
+            thinking = kwargs.get("thinking", False)
+            if prefill:
+                if thinking == "enabled":
+                    content = [
+                        {"reasoningContent": {"reasoningText":{"text":"I need to keep my thinking concise as requested. Just a few words to guide my response.","signature":"ErcBCkgIAxABGAIiQGKmNvGUHvwkPWsnesh49hf4WZEk4n9F5ef3s6M9IloXcLwCVRhkPitlTNXk3OJucTZK7EVQIhdUuB88+I9aXNESDFSHmX7kAJPTsxiQfxoM1XH1IVX7dmMbjDzfIjByeTCJCojCLd2YhGb7AmhPu1kFZtgtY8Hena7l4J65J7tI53sxVMaAELYoCRv7abwqHcow9xCqIv8WyGWD0B1ZzmuTrzCyD+O4qUMJn/5L"}}},
+                        # {"reasoningContent": {"reasoningText":{"text":"Let me analyze it","signature":"ErcBCkgIAxABGAIiQCHBkxMFXcgN4LCQZEuPZzzVK932MXBei/hMeM4JoZRG8wJ1tqCELSMhfpSFQo3gH4tgq5h6zIFNMQfH3zIhofQSDD4fMeu3vXWn0msdfBoMNncvT6yJmmD9iWy/IjAssppItejVELvGvTOXbORMrnoaXpadqZ+IS8PBA4IZ4gTDuhBR59x1lSgwhnji6pUqHbv9HBikizkVL4wDdswwtbfF2FyBromfiVROODUJ"}}},
+                        # {"reasoningContent": {"redactedContent":""}},
+                        {"text": prefill}
+                    ]
+                    new_message: Message = {"role": "assistant", "content": content}
+                else:
+                    new_message: Message = {"role": "assistant", "content": [{"text": prefill}]}
+                self.messages.append(new_message)
 
             # Execute the event loop cycle with retry logic for context limits
             return self._execute_event_loop_cycle(invocation_callback_handler, kwargs)
